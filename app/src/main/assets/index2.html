@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/input.css">
+</head>
+
+<body>
+    <div id="load" style="height: 100%;">
+        <img src="img/music.png" alt="" style="height: 200px; position: relative; left: 50%; margin-left: -100px; top: 50%; margin-top: -150px;">
+        <div class="bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+    <div class="card" id="app" style="display: none;">
+        <div class="head">
+
+
+            <img src="img/music.png" alt="">
+            <div class="mini-bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+        </div>
+
+        <div :class="play != null ? 'body' : 'body-full'">
+            <div :class="'music-card' + (i == play ? ' active' : '')" v-for="(m ,i) in musicas" @click="play = i">
+                <div style="display: flex;">
+
+
+                    <div style="display: inline-block; width: calc(100% - 30px); height: 100%;">
+                        <span class="titulo" style="height: 50px; max-height: 50px;">{{m.nome}}</span>
+                        <span class="duracao">{{(m.duracao / (1000 * 60)).toFixed(2).replace('.', ':')}}</span>
+                    </div>
+                    <div style="display: inline-block; width: 30px; height: 100%;">
+                        <div style="height: 40px; display: flex;" @click="deletar(i, $event)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16" style="margin: auto">
+                                <path
+                                    d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                                <path fill-rule="evenodd"
+                                    d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                            </svg>
+                        </div>
+                        <div style="height: 40px; display: flex;" @click="compartilhar(i, $event)">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-share" viewBox="0 0 16 16" style="margin: auto">
+                                <path
+                                    d="M13.5 1a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zM11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.499 2.499 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5zm-8.5 4a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3zm11 5.5a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z" />
+                            </svg>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="foot" v-if="play != null">
+            <div style="padding-left: 10px; padding-right: 10px; padding-top: 10px;">
+                <span class="titulo" style="color: #5400d8; text-overflow: ellipsis; white-space: nowrap; overflow: hidden;
+                ">
+                    {{musicas[play].nome}}
+                </span>
+                <div class="empty-progress" @click="tempo($event)">
+                    <div class="progress" style="width: 0px;" ref="barra">
+
+                    </div>
+                </div>
+                <audio ref="audio" v-if="foot" @timeupdate="playing($event)" @ended="proxima">
+                    <source :src="musicas[play].url" type="audio/mpeg">
+                </audio>
+            </div>
+            <div class="linha ">
+                <div class="col ">
+                    <div class="botao " @click="anterior">
+                        <svg xmlns="http://www.w3.org/2000/svg " width="25 " height="25 " fill="currentColor " class="bi bi-chevron-double-left " viewBox="0 0 16 16 ">
+                            <path fill-rule="evenodd "
+                                d="M8.354 1.646a.5.5 0 0 1 0 .708L2.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z " />
+                            <path fill-rule="evenodd "
+                                d="M12.354 1.646a.5.5 0 0 1 0 .708L6.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z " />
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="col ">
+                    <div class="botao " @click="reproduzindo = !reproduzindo;">
+                        <svg xmlns="http://www.w3.org/2000/svg " width="25 " height="25 " fill="currentColor " v-if="!reproduzindo" class="bi bi-caret-right " viewBox="0 0 16 16 ">
+                            <path
+                                d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z " />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-pause" viewBox="0 0 16 16" v-else>
+                            <path
+                                d="M6 3.5a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5zm4 0a.5.5 0 0 1 .5.5v8a.5.5 0 0 1-1 0V4a.5.5 0 0 1 .5-.5z" />
+                        </svg>
+                    </div>
+
+                </div>
+                <div class="col ">
+                    <div class="botao " @click="proxima">
+                        <svg xmlns="http://www.w3.org/2000/svg " width="25 " height="25 " fill="currentColor " class="bi bi-chevron-double-right " viewBox="0 0 16 16 ">
+                            <path fill-rule="evenodd "
+                                d="M3.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L9.293 8 3.646 2.354a.5.5 0 0 1 0-.708z " />
+                            <path fill-rule="evenodd "
+                                d="M7.646 1.646a.5.5 0 0 1 .708 0l6 6a.5.5 0 0 1 0 .708l-6 6a.5.5 0 0 1-.708-.708L13.293 8 7.646 2.354a.5.5 0 0 1 0-.708z " />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <script src="js/vue.js "></script>
+    <script>
+        const VUE = new Vue({
+            el: '#app',
+            data: {
+                musicas: [],
+                play: null,
+                foot: false,
+                reproduzindo: false,
+
+            },
+            mounted() {
+
+                setTimeout(() => {
+                    this.atualizar();
+                    document.getElementById('load').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                }, 1000)
+            },
+            methods: {
+                proxima() {
+                    this.play = ++this.play % this.musicas.length;
+                },
+                anterior() {
+                    if (this.$refs.audio.currentTime < 5) {
+                        if (this.play == 0) {
+                            this.play = this.musicas.length - 1;
+                        } else {
+                            this.play--;
+                        }
+                    } else {
+                        this.$refs.audio.currentTime = 0;
+                    }
+
+                },
+                compartilhar(i, e) {
+                    e.stopPropagation();
+                    Device.compartilharCom(this.musicas[i].id);
+
+                },
+                deletar(i, e) {
+                    Device.apagar(this.musicas[i].id);
+                    this.musicas.splice(i, 1);
+                    Device.write('musicas.json', JSON.stringify(this.musicas));
+                    this.reproduzindo = false;
+                    this.play = null;
+                    e.stopPropagation();
+                },
+                playing(e) {
+                    var currentTime = e.currentTarget.currentTime;
+                    var duration = e.currentTarget.duration;
+                    var porc = (currentTime * 100 / duration);
+                    if (porc < 3) {
+                        this.$refs.barra.style.width = '3%';
+                    } else {
+                        this.$refs.barra.style.width = porc + '%';
+                    }
+                },
+                atualizar() {
+                    var json = Device.read('musicas.json');
+                    // var json = [{
+                    //     nome: 'teste sahdsahdjasdjkaskdk hasjdhjhsa dhashd sad haskd sadhas',
+                    //     id: 'o'
+                    // }]
+                    if (json == null) {
+                        json = [];
+                    } else {
+                        json = JSON.parse(json);
+                    }
+                    for (const key in json) {
+                        json[key].url = Device.find(json[key].id);
+                        //  json[key].url = 'X:/Dwloads/lol/Piercing Light (Mako Remix).mp3';
+                    }
+                    this.musicas = json;
+                },
+                tempo(e) {
+                    var total = e.currentTarget.offsetWidth;
+                    var atual = e.clientX;
+                    var duration = this.$refs.audio.duration;
+                    var porc = (atual * 100 / total);
+                    if (porc < 3) {
+                        this.$refs.barra.style.width = '3%';
+                    } else {
+                        this.$refs.barra.style.width = porc + '%';
+                    }
+
+                    this.$refs.audio.currentTime = duration * porc / 100;
+                    if (!this.reproduzindo) {
+                        this.reproduzindo = true;
+                    }
+                },
+                forcePlay() {
+                    this.reproduzindo = !this.reproduzindo;
+                }
+            },
+            watch: {
+                play(play) {
+                    if (play != null) {
+
+                        Device.colocarServico(this.musicas[play].nome);
+
+                        this.foot = false;
+                        setTimeout(() => {
+                            this.foot = true;
+                            setTimeout(() => {
+                                if (this.reproduzindo) {
+                                    this.$refs.audio.play();
+                                }
+                                this.reproduzindo = true;
+                            })
+                        }, 100)
+                    }
+                },
+                reproduzindo(r) {
+                    try {
+                        Device.tocando(r);
+                    } catch (e) {
+
+                    }
+                    if (r) {
+                        this.$refs.audio.play();
+                    } else {
+                        this.$refs.audio.pause();
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

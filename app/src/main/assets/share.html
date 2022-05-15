@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/input.css">
+</head>
+
+<body>
+    <div id="load" style="height: 100%;">
+        <img src="img/music.png" alt="" style="height: 200px; position: relative; left: 50%; margin-left: -100px; top: 50%; margin-top: -150px;">
+        <div class="bars">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+        </div>
+    </div>
+    <div class="card" id="app" style="display: none;">
+        <div class="head">
+
+
+            <img src="img/music.png" alt="">
+            <div class="mini-bars">
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+
+        </div>
+
+        <div class="body-full">
+            <div class="music-card" style="padding-right: 10px; padding-left: 10px;">
+                <div class="question">
+                    <input type="text" v-model="nome" />
+                    <label>Nome</label>
+                </div>
+            </div>
+            <div v-if="!baixando">
+                <img v-if="imagem" :src="imagem" style="width: calc(100% - 20px); margin: 10px;" alt="">
+                <div style="display: flex;">
+                    <div class="button" @click="baixar">
+                        Download
+                        <span>
+                            <span></span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <h1 style="text-align: center; color: #5400d8;" v-else>{{Math.ceil(prog)}}%</h1>
+        </div>
+    </div>
+    <script src="js/vue.js"></script>
+    <script>
+        const VUE = new Vue({
+            el: '#app',
+            data: {
+                nome: '',
+                imagem: null,
+                baixando: false,
+                id: null,
+                url: null,
+                prog: 0,
+            },
+            mounted() {
+                var meta = JSON.parse(Device.meta(Device.id()));
+                this.nome = meta.nome;
+                this.id = meta.id;
+                this.duracao = meta.duracao;
+                this.imagem = meta.tumb;
+                this.url = meta.url;
+                // Device.toast(meta);
+                // this.imagem = 'https://i.ytimg.com/vi/6swmTBVI83k/maxresdefault.jpg?v=605bbd4e'
+                setTimeout(() => {
+                    document.getElementById('load').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                }, 1)
+            },
+            methods: {
+                progresso(total, id) {
+                    this.prog = total;
+                    this.$forceUpdate();
+                },
+                finalizado(id) {
+                    this.baixando = false;
+                    var json = Device.read('musicas.json');
+                    if (json == null) {
+                        json = [];
+                    } else {
+                        json = JSON.parse(json);
+                    }
+                    json.push({
+                        nome: this.nome,
+                        duracao: this.duracao,
+                        id: this.id
+                    });
+                    Device.write('musicas.json', JSON.stringify(json));
+                    Device.toast('Salvo');
+                    setTimeout(() => {
+                        Device.sair();
+                    }, 300)
+                },
+                erro(id) {
+                    this.baixando = false;
+                    Device.toast('Um erro ocorreu');
+                },
+                baixar() {
+                    this.baixando = true;
+                    Device.download(this.url);
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>

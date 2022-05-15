@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="./assets/css/material-dashboard.css?v=2.1.0" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="./assets/css/google.css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons"
+    />
+    <link rel="stylesheet" href="./assets/fonts/css/all.css" />
+    <title>Document</title>
+    <style>
+      .video-preview {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <nav
+      class="navbar navbar-expand-lg mb-1"
+      style="background-color: #fc0018 !important"
+    >
+      <a
+        class="navbar-brand text-white"
+        href="#"
+        data-toggle="modal"
+        data-target="#exampleModalCenter"
+        ><i class="fa fa-plus" style="font-size: 30px"></i
+      ></a>
+      <img
+        src="img/hiena.png"
+        alt=""
+        style="height: 60px; margin: auto; padding-right: 50px"
+        onclick="window.location.reload()"
+      />
+    </nav>
+    <div id="app">
+      <div class="row px-2" v-for="(video, key) in videos">
+        <div class="col-12">
+          <div class="card card-stats">
+            <div class="card-header card-header-danger card-header-icon">
+              <div class="card-icon">
+                <i class="material-icons">{{video.categoria}}</i>
+              </div>
+              <i class="fa fa-compass"></i>
+              <h3 class="card-category">
+                <b>{{video.titulo}}</b>
+              </h3>
+              <!-- <p class="card-title mt-1">
+              0
+              <small>MB</small>
+            </p> -->
+            </div>
+            <div class="card-body pb-1">
+              <div
+                class="w-100"
+                tumb
+                @click="executar(video, key)"
+                v-if="!video.executando"
+              >
+                <div
+                  class="d-flex"
+                  style="
+                    position: absolute;
+                    z-index: 1000;
+                    width: 90%;
+                    height: 85%;
+                  "
+                >
+                  <img
+                    class=""
+                    src="img/youtubeplay.png"
+                    alt="logo"
+                    style="width: 50px; margin: auto"
+                  />
+                </div>
+              </div>
+              <img
+                class="video-preview"
+                :src="video.tumb"
+                alt="logo"
+                tumb
+                @click="executar(video, key)"
+                v-if="!video.executando"
+              />
+              <video
+                @click="executar(video, key)"
+                @pause="executar(video, key)"
+                controls
+                class="video-preview"
+                v-show="video.executando"
+                :id="'video-element-' + key"
+              >
+                <source :src="video.url" type="video/mp4" v-if="video.baixado"/>
+                <source :src="video.url" type="video/mp4" v-if="!video.baixado"/>
+                Your browser does not support the video tag.
+              </video>
+            </div>
+            <div class="card-footer pt-0">
+              <div class="w-100 px-2">
+                <div class="row">
+                  <p class="card-title col-12">
+                    {{video.visualizacao}}
+                    <small>visualizações</small>
+                  </p>
+                </div>
+                <div class="row">
+                  <div class="col-12">
+                    <button
+                      type="button"
+                      class="btn btn-success"
+                      @click="baixar(video)"
+                      v-if="!video.baixado"
+                    >
+                      Baixar
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-danger float-right"
+                      @click="apagar(key)"
+                    >
+                      Apagar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      class="modal fade"
+      id="exampleModalCenter"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="exampleModalCenterTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div
+            class="modal-header"
+            style="background-color: #fc0018 !important"
+          >
+            <h5 class="modal-title text-white" id="exampleModalLongTitle">
+              Adicionar novo video
+            </h5>
+            <button
+              type="button"
+              class="close text-white"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <span class="input-group-text p-0" id="basic-addon3"
+              >https://www.youtube.com/watch?v=</span
+            >
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                aria-describedby="basic-addon3"
+                id="input-id"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-danger" data-dismiss="modal">
+              Cancelar
+            </button>
+            <button
+              type="button"
+              class="btn btn-success"
+              onclick="VUE.salvarModal()"
+              data-dismiss="modal"
+            >
+              Salvar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./assets/js/core/jquery.min.js"></script>
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap-material-design.min.js"></script>
+    <script src="./assets/js/plugins/perfect-scrollbar.jquery.min.js"></script>
+    <script src="./assets/js/plugins/chartist.min.js"></script>
+    <script src="./assets/js/plugins/bootstrap-notify.js"></script>
+    <script src="./assets/js/material-dashboard.js?v=2.1.0"></script>
+    <script src="./assets/fonts/js/all.js"></script>
+    <script src="./assets/js/vue.js"></script>
+    <script>
+      const VUE = new Vue({
+        el: "#app",
+        data: {
+          videos: [],
+          executando: null,
+          baixando: null,
+        },
+        created() {
+          this.videos = JSON.parse(Device.read("config.json"));
+        },
+        methods: {
+          executar(video, key) {
+            //   debugger
+            const element = document.getElementById("video-element-" + key);
+            if (this.executando != null) {
+              if (this.executando == key) {
+                if (video.executando) {
+                  element.pause();
+                  video.executando = false;
+                } else {
+                  element.play();
+                  video.executando = true;
+                }
+                this.executando = null;
+              } else {
+                alert("gg");
+                const anterior = document.getElementById(
+                  "video-element-" + this.executando
+                );
+                anterior.pause();
+                anterior.currentTime = 0;
+                anterior.load();
+                this.videos[this.executando].executando = false;
+                element.play();
+                this.executando = key;
+              }
+            } else {
+              element.play();
+              this.executando = key;
+              video.executando = true;
+            }
+          },
+          salvarModal() {
+            const idVideo = $("#input-id").val();
+            if (idVideo && idVideo != "") {
+              Device.video(idVideo);
+            }
+          },
+          salvar() {
+            Device.write("config.json", toByte(JSON.stringify(this.videos)));
+          },
+          apagar(key) {
+            this.videos.splice(key, 1);
+            this.salvar();
+          },
+          addVideo(video) {
+            (video.categoria = "music_video"), (video.baixado = false);
+            video.executando = false;
+            this.videos.push(video);
+            this.salvar();
+            Device.toast("Video adicionado");
+            $("#input-id").val("");
+          },
+          baixar(video) {
+            Device.videoDownload(video.id);
+            video.baixado = true;
+            video.timer = setTimeout(() => {
+              video.baixado = false;
+            }, 2000);
+          },
+          baixarItem(id) {
+            for (const key in this.videos) {
+              if (this.videos[key].id == id) {
+                clearTimeout(this.videos[key].timer);
+                this.videos[key].baixado = true;
+                this.videos[key].url = "../videos/" + id + ".mp4";
+                this.salvar();
+                break;
+              }
+            }
+          },
+        },
+      });
+      function toByte(str) {
+        var bytes = [];
+        for (var i = 0; i < str.length; i++) {
+          var char = str.charCodeAt(i);
+          //bytes.push(char >>> 8);
+          bytes.push(char & 0xff);
+        }
+        return bytes;
+      }
+
+      function toString(bytes) {
+        var str = "";
+        for (var i = 0; i < bytes.length; i++) {
+          var char = bytes[i];
+          //bytes.push(char >>> 8);
+          str += char & 0xff;
+        }
+        return bytes;
+      }
+    </script>
+  </body>
+</html>
